@@ -1,5 +1,8 @@
+import copy
+
 import cv2 as cv
 from . import constants as const
+from .data_structures import Shape
 
 
 def get_grayscale_blurred_image(image):
@@ -9,6 +12,7 @@ def get_grayscale_blurred_image(image):
 
 
 def filter_shapes(contours, image):
+    img_copy = copy.copy(image)
     img_size = image.shape
     img_min_dimension = min(img_size[0], img_size[1])
 
@@ -16,8 +20,8 @@ def filter_shapes(contours, image):
     min_bounds_size = img_min_dimension * 0.03
     min_rect_size = img_min_dimension * 0.025
     max_rect_size = img_min_dimension * 0.19
-    min_filling = const.MIN_DIAMOND_EXTENT
-    max_filling = const.MAX_OVAL_EXTENT
+    min_covering = const.MIN_DIAMOND_EXTENT
+    max_covering = const.MAX_OVAL_EXTENT
 
     possible_shapes = []
 
@@ -25,36 +29,34 @@ def filter_shapes(contours, image):
         contour = contours[i]
         if len(contour) < min_contour_points:
             continue
-        bounding_rect = cv.boundingRect(contour)
-        if bounding_rect[2] < min_bounds_size and bounding_rect[3] < min_bounds_size:
+        _, _, rectangle_w, rectangle_h = cv.boundingRect(contour)
+        if min(rectangle_w, rectangle_h) < min_bounds_size:
             if const.DEBUG:
-                cv.drawContours(image, contours, i, const.SMALL_CONTOUR_BOUNDING, 2, cv.LINE_8)
+                cv.drawContours(img_copy, contours, i, const.SMALL_CONTOUR_BOUNDING, 2, cv.LINE_8)
             continue
 
-        min_rect = cv.minAreaRect(contour)
+        shape = Shape(contour)
 
-        if min_rect[1][0] < min_rect_size or min_rect[1][1] < min_rect_size:
+        if shape.min_dimension < min_rect_size:
             if const.DEBUG:
-                cv.drawContours(image, contours, i, const.SMALL_CONTOUR_MIN_RECT, 2, cv.LINE_8)
+                cv.drawContours(img_copy, contours, i, const.SMALL_CONTOUR_MIN_RECT, 2, cv.LINE_8)
             continue
-        if min_rect[1][0] > max_rect_size and min_rect[1][1] > max_rect_size:
+        if shape.min_dimension > max_rect_size:
             if const.DEBUG:
-                cv.drawContours(image, contours, i, const.BIG_CONTOUR_MIN_RECT, 2, cv.LINE_8)
+                cv.drawContours(img_copy, contours, i, const.BIG_CONTOUR_MIN_RECT, 2, cv.LINE_8)
             continue
 
-        area = cv.contourArea(contour)
-        filling = area / min_rect[1][0] / min_rect[1][1]
-        if filling < min_filling:
+        if shape.covering < min_covering:
             if const.DEBUG:
-                cv.drawContours(image, contours, i, const.SMALL_FILLING, 2, cv.LINE_8)
+                cv.drawContours(img_copy, contours, i, const.SMALL_FILLING, 2, cv.LINE_8)
             continue
-        if filling > max_filling:
+        if shape.covering > max_covering:
             if const.DEBUG:
-                cv.drawContours(image, contours, i, const.BIG_FILLING, 2, cv.LINE_8)
+                cv.drawContours(img_copy, contours, i, const.BIG_FILLING, 2, cv.LINE_8)
             continue
         if const.DEBUG:
-            cv.drawContours(image, contours, i, const.CORRECT_CONTOUR, 2, cv.LINE_8)
-        possible_shapes.append(contour)
+            cv.drawContours(img_copy, contours, i, const.CORRECT_CONTOUR, 2, cv.LINE_8)
+        possible_shapes.append(shape)
     if const.DEBUG:
-        cv.imwrite("images/debug/filter_contours.jpg", image)
+        cv.imwrite("images/debug/filter_contours.jpg", img_copy)
     return possible_shapes
