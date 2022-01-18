@@ -25,7 +25,7 @@ def read_image(path):
     return image
 
 
-def rgb_to_hsl(color):
+def rgb_to_hls(color):
     rgb_image = np.uint8([[[color[0], color[1], color[2]]]])
-    hsl_image = cv.cvtColor(rgb_image, cv.COLOR_RGB2HSV)
-    return hsl_image[0][0]
+    hls_image = cv.cvtColor(rgb_image, cv.COLOR_BGR2HLS)
+    return hls_image[0][0]

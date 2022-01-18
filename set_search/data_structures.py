@@ -66,7 +66,7 @@ class Shape:
             self.type = ShapeType.ERROR
 
     def set_shape_color(self):
-        hue_angle = self.mean_contour_color[0] / 255 * 360
+        hue_angle = self.mean_contour_color[0]
         if const.MIN_GREEN_HUE <= hue_angle <= const.MAX_GREEN_HUE:
             self.color = Color.GREEN
         elif const.MIN_PURPLE_HUE <= hue_angle <= const.MAX_PURPLE_HUE:
@@ -75,6 +75,7 @@ class Shape:
             self.color = Color.RED
 
     def set_shading(self):
+        self.brightness_difference = int(self.mean_outer_color[1]) - self.mean_inner_color[1]
         if self.brightness_difference <= const.MAX_OUTLINED_BRIGHTNESS_DIFFERENCE:
             self.shading = Shading.OUTLINED
         elif self.brightness_difference <= const.MAX_STRIPED_BRIGHTNESS_DIFFERENCE:
@@ -87,3 +88,5 @@ class Shape:
 
     def shading_debug(self):
         return f"{self.shading} {self.brightness_difference}"
+    def color_debug(self):
+        return f"{self.mean_contour_color}, {self.color}"
