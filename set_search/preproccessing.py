@@ -58,5 +58,5 @@ def filter_shapes(contours, image):
             cv.drawContours(img_copy, contours, i, const.CORRECT_CONTOUR, 2, cv.LINE_8)
         possible_shapes.append(shape)
     if const.DEBUG:
-        cv.imwrite("images/debug/filter_contours.jpg", img_copy)
+        cv.imwrite("images/debug/filtered_contours.jpg", img_copy)
     return possible_shapes

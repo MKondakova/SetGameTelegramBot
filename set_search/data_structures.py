@@ -1,18 +1,17 @@
-from enum import Enum
+from enum import IntFlag
 
 import cv2 as cv
 
 from . import constants as const
 
 
-class ShapeType(Enum):
+class ShapeType(IntFlag):
     OVAL = 1
     SQUIGGLE = 2
     DIAMOND = 3
-    ERROR = 4
 
 
-class Color(Enum):
+class Color(IntFlag):
     GREEN = 1
     RED = 2
     PURPLE = 3
@@ -26,7 +25,7 @@ class Color(Enum):
             return 128, 0, 128
 
 
-class Shading(Enum):
+class Shading(IntFlag):
     SOLID = 1
     STRIPED = 2
     OUTLINED = 3
@@ -63,7 +62,7 @@ class Shape:
         elif const.MIN_DIAMOND_EXTENT <= self.covering <= const.MAX_DIAMOND_EXTENT:
             self.type = ShapeType.DIAMOND
         else:
-            self.type = ShapeType.ERROR
+            self.type = ShapeType.DIAMOND
 
     def set_shape_color(self):
         hue_angle = self.mean_contour_color[0]
@@ -88,5 +87,49 @@ class Shape:
 
     def shading_debug(self):
         return f"{self.shading} {self.brightness_difference}"
+
     def color_debug(self):
         return f"{self.mean_contour_color}, {self.color}"
+
+    def __eq__(self, other):
+        if isinstance(other, Shape):
+            return self.min_dimension == other.min_dimension
+
+
+class Card:
+    shapes = []
+    amount = None
+    type = None
+    color = None
+    shading = None
+
+    def __init__(self, shapes=None):
+        if shapes is None:
+            shapes = []
+        self.shapes = shapes
+
+    @staticmethod
+    def add_shapes_to_cards(cards, shape1: Shape, shape2: Shape):
+        for card in cards:
+            if shape1 in card.shapes:
+                card.shapes.append(shape2)
+                return
+            elif shape2 in card.shapes:
+                card.shapes.append(shape1)
+                return
+        cards.append(Card([shape1, shape2]))
+
+    def __str__(self):
+        return f"{len(self.shapes)}:{[s.__str__() for s in self.shapes]}"
+
+    def complete_card(self):
+        self.amount = len(self.shapes)
+        self.type = self.shapes[0].type
+        if not all(s.type == self.type for s in self.shapes):
+            raise Exception("Difference types detected")
+        self.color = self.shapes[0].color
+        if not all(s.color == self.color for s in self.shapes):
+            raise Exception("Difference colors detected")
+        self.shading = self.shapes[0].shading
+        if not all(s.shading == self.shading for s in self.shapes):
+            raise Exception("Difference shadings detected")
