@@ -33,11 +33,12 @@ def get_sets(image):
     shapes = search.detect_shape_and_color(copy.copy(image))
     cards = search.group_shapes_into_cards(shapes, copy.copy(image))
     sets = find_sets(cards)
-    result = []
-    for i in range(len(sets)):
-        cards = sets[i]
-        result.append(utils.draw_set(cards, copy.copy(image)))
-        cv.imwrite(f"{const.DEBUG_PATH}image{i}.jpg", image)
-    return result
+    if const.DEBUG:
+        for i in range(len(sets)):
+            cards = sets[i]
+            set_image = copy.copy(image)
+            utils.draw_set(cards, set_image)
+            cv.imwrite(f"{const.DEBUG_PATH}image{i}.jpg", set_image)
+    return sets, image
 
 

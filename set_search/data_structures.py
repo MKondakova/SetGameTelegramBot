@@ -10,6 +10,14 @@ class ShapeType(IntFlag):
     SQUIGGLE = 2
     DIAMOND = 3
 
+    def __str__(self):
+        if self == ShapeType.OVAL:
+            return "овалы"
+        elif self == ShapeType.DIAMOND:
+            return "ромбы"
+        else:
+            return "волны"
+
 
 class Color(IntFlag):
     GREEN = 1
@@ -24,6 +32,14 @@ class Color(IntFlag):
         else:
             return 128, 0, 128
 
+    def __str__(self):
+        if self == Color.RED:
+            return "красный"
+        elif self == Color.GREEN:
+            return "зеленый"
+        else:
+            return "фиолетовый"
+
 
 class Shading(IntFlag):
     SOLID = 1
@@ -37,6 +53,14 @@ class Shading(IntFlag):
             return 3
         else:
             return 1
+
+    def __str__(self):
+        if self == Shading.SOLID:
+            return "закрашенные"
+        elif self == Shading.STRIPED:
+            return "заштрихованные"
+        else:
+            return "пустые"
 
 
 class Shape:
@@ -126,10 +150,10 @@ class Card:
         self.amount = len(self.shapes)
         self.type = self.shapes[0].type
         if not all(s.type == self.type for s in self.shapes):
-            raise Exception("Difference types detected")
+            raise Exception("Different shapes detected")
         self.color = self.shapes[0].color
         if not all(s.color == self.color for s in self.shapes):
-            raise Exception("Difference colors detected")
+            raise Exception("Different colors detected")
         self.shading = self.shapes[0].shading
         if not all(s.shading == self.shading for s in self.shapes):
-            raise Exception("Difference shadings detected")
+            raise Exception("Different shadings detected")

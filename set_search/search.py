@@ -152,7 +152,7 @@ def group_shapes_into_cards(shapes: list[Shape], image):
         shape_center = (int(shape.min_rect[0][0]), int(shape.min_rect[0][1]))
         if const.DEBUG:
             cv.circle(image, shape_center, 1, (255, 255, 255), 1)
-            cv.circle(image, shape_center, int(const.CIRCLE_RADIUS_COEFFICIENT * shape.min_dimension), (255, 255, 255), 1)
+            cv.circle(image, shape_center, int(const.CIRCLE_RADIUS_COEFFICIENT * shape.min_dimension), (255, 255, 255), 2)
         for j in range(i+1, len(shapes)):
             another_shape = shapes[j]
             another_shape_center = (int(another_shape.min_rect[0][0]), int(another_shape.min_rect[0][1]))
